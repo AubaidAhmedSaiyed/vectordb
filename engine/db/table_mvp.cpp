@@ -349,19 +349,6 @@ Status TableMVP::Search(const std::string &field_name,
     }
   }
 
-  // Get the field offset in the vector table.
-  int64_t field_offset = table_segment_->vec_field_name_executor_pool_idx_map_[field_name];
-
-  // [Note] the following invocation is wrong
-  //   execution::RAIIVecSearchExecutor(executor_pool_[field_offset],
-  //   executor_pool_[field_offset]->acquire);
-  // because the value of executor_pool_[field_offset] could be different when
-  // evaluating twice, which will result in memory leak or core dump
-  std::unique_lock<std::mutex> lock(executor_pool_mutex_);
-  auto pool = executor_pool_.at(field_offset);
-  auto executor = execution::RAIIVecSearchExecutor(pool, pool->acquire());
-  lock.unlock();
-
   if (std::holds_alternative<DenseVectorPtr>(query_data)) {
     size_t field_dimension = 0;
     for (const auto &f : table_schema_.fields_) {
@@ -390,10 +377,10 @@ Status TableMVP::Search(const std::string &field_name,
 Status TableMVP::ExecuteSingleSearch(
     const VectorPtr query_data,
     const int64_t limit,
-    const std::vector<query::expr::ExprNodePtr> &filter_nodes,
+    std::vector<query::expr::ExprNodePtr> &filter_nodes,
     std::vector<std::string> query_fields,
     bool with_distance,
-    std::shared_ptr<execution::ExecutorPool<execution::VecSearchExecutor>> pool,
+    std::shared_ptr<execution::ExecutorPool> pool,
     std::vector<execution::FacetExecutor> &facet_executors,
     vectordb::Json &result,
     vectordb::Json &facets) {

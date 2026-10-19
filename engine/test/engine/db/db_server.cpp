@@ -613,8 +613,8 @@ TEST(DbServer, SearchBatch) {
     auto singleStatus = database.Search(dbName, tableName, fieldName, queryFields, queryDimension, distinct_queries[i], 2, single_result, "", true, facetsConfig, single_facets);
     EXPECT_TRUE(singleStatus.ok()) << singleStatus.message();
 
-    auto batch_elem_str = batch_distinct_result.GetArrayElement(i).ToString();
-    auto single_elem_str = single_result.ToString();
+    auto batch_elem_str = batch_distinct_result.GetArrayElement(i).DumpToString();
+    auto single_elem_str = single_result.DumpToString();
     EXPECT_EQ(batch_elem_str, single_elem_str) << "Batch result for query " << i << " must match single Search result";
   }
 

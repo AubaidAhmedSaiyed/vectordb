@@ -515,7 +515,7 @@ Status DBServer::Search(const std::string& db_name,
 
   // Facets validation
   std::vector<vectordb::engine::execution::FacetExecutor> facet_executors;
-  Status facet_status = preprocessFacets(facets_config, table.get(), facet_executors);
+  Status facet_status = preprocessFacets(facets_config, table, facet_executors);
   if (!facet_status.ok()) {
     return facet_status;
   }
@@ -544,10 +544,10 @@ Status DBServer::SearchBatch(const std::string& db_name,
   }
 
   std::vector<std::vector<vectordb::engine::execution::FacetExecutor>> batch_facet_executors;
-  if (!facets_config.empty() && facets_config.IsArray() && facets_config.GetSize() > 0) {
+  if (facets_config.IsArray() && facets_config.GetSize() > 0) {
     batch_facet_executors.resize(queries_data.size());
     for (size_t q = 0; q < queries_data.size(); ++q) {
-      Status facet_status = preprocessFacets(facets_config, table.get(), batch_facet_executors[q]);
+      Status facet_status = preprocessFacets(facets_config, table, batch_facet_executors[q]);
       if (!facet_status.ok()) {
         return facet_status;
       }

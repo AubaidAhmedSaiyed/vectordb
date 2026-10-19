@@ -60,10 +60,10 @@ class TableMVP {
   Status ExecuteSingleSearch(
       const VectorPtr query_data,
       const int64_t limit,
-      const std::vector<query::expr::ExprNodePtr> &filter_nodes,
+      std::vector<query::expr::ExprNodePtr> &filter_nodes,
       std::vector<std::string> query_fields,
       bool with_distance,
-      std::shared_ptr<execution::ExecutorPool<execution::VecSearchExecutor>> pool,
+      std::shared_ptr<execution::ExecutorPool> pool,
       std::vector<execution::FacetExecutor> &facet_executors,
       vectordb::Json &result,
       vectordb::Json &facets);
